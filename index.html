@@ -327,12 +327,19 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
 
   async function resolveStop() {
     if (stopId) return stopId;
-    const data = await getJSON(API + "/stops/name/" + encodeURIComponent(stopQuery) + "?key=" + encodeURIComponent(apiKey));
-    const groups = data.stop_groups || [];
+    // Try the typed name first, then shorter fallbacks (SL spells the stop "Biomedicum")
+    const words = stopQuery.split(/\s+/).filter(Boolean);
+    const tries = [...new Set([stopQuery, words[words.length - 1], "Biomedicum", "Biomedikum"].filter(Boolean))];
     const want = stopQuery.toLowerCase();
-    const pick = groups.find(g => (g.name || "").toLowerCase() === want)
-      || groups.find(g => (g.name || "").toLowerCase().includes("biomedikum"))
-      || groups[0];
+    let pick = null;
+    for (const q of tries) {
+      const data = await getJSON(API + "/stops/name/" + encodeURIComponent(q) + "?key=" + encodeURIComponent(apiKey));
+      const groups = data.stop_groups || [];
+      pick = groups.find(g => (g.name || "").toLowerCase() === want)
+        || groups.find(g => /biomedi[ck]um/i.test(g.name || ""))
+        || groups[0] || null;
+      if (pick) break;
+    }
     if (!pick) throw new Error("Hittade ingen hållplats för “" + stopQuery + "”");
     stopId = String(pick.id);
     stopName = pick.name || "";

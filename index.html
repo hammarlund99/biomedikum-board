@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
+<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Biomedikum"><meta name="theme-color" content="#030308"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
 <title>Biomedikum Departures</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -161,10 +161,27 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
 @keyframes rise { from { opacity: .3; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
 
+/* Phone: everything fits one screen, also as a home-screen app */
 @media (max-width: 560px) {
+  .wrap { gap: 12px; padding-block: 10px; }
+  header { flex-wrap: nowrap; align-items: center; }
+  .stop-eyebrow { font-size: .62rem; letter-spacing: .2em; gap: 8px; }
+  h1 { font-size: 1.9rem; margin-top: 4px; }
+  h1 small { font-size: .5em; }
+  .clock .t { font-size: 1.9rem; }
+  .clock .d { font-size: .58rem; letter-spacing: .14em; margin-top: 4px; }
   .cols { display: none; }
-  .row { grid-template-columns: 64px minmax(0,1fr) auto; }
-  .clock { text-align: left; }
+  .board { gap: 8px; flex: 0 0 auto; }
+  .row { grid-template-columns: 54px minmax(0,1fr) auto; gap: 12px; padding: 10px 12px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+  .line { font-size: 1.45rem; }
+  .dest .name { font-size: 1.2rem; }
+  .dest .meta { font-size: .66rem; margin-top: 3px; gap: 8px; }
+  .eta .n { font-size: 2.1rem; }
+  .eta .u { font-size: .62rem; letter-spacing: .15em; }
+  .eta .now { font-size: 1.5rem; }
+  footer { font-size: .64rem; gap: 8px 12px; }
+  .refresh { flex-basis: 100%; max-width: none; order: -1; }
+  button.gear { padding: 5px 10px; }
 }
 </style>
 

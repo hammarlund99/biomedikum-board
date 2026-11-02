@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Biomedikum"><meta name="theme-color" content="#030308"><style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
+<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Biomedikum"><meta name="theme-color" content="#030308"><style>html{background:#030308}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
 <title>Biomedikum Departures</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -165,7 +165,7 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
 
 /* Phone: everything fits one screen, also as a home-screen app */
 @media (max-width: 560px) {
-  .wrap { gap: 12px; padding-block: 10px; }
+  .wrap { gap: 12px; padding-block: 12px; height: 100%; min-height: 0; }
   header { flex-wrap: nowrap; align-items: center; }
   .stop-eyebrow { font-size: .62rem; letter-spacing: .2em; gap: 8px; }
   h1 { font-size: 1.9rem; margin-top: 4px; }
@@ -173,7 +173,7 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
   .clock .t { font-size: 1.9rem; }
   .clock .d { font-size: .58rem; letter-spacing: .14em; margin-top: 4px; }
   .cols { display: none; }
-  .board { gap: 8px; flex: 0 0 auto; }
+  .board { gap: 8px; flex: 1 1 auto; display: grid; grid-auto-rows: minmax(64px, 1fr); }
   .row { grid-template-columns: 54px minmax(0,1fr) auto; gap: 12px; padding: 10px 12px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
   .line { font-size: 1.45rem; }
   .dest .name { font-size: 1.2rem; }

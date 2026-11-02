@@ -129,6 +129,10 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
 .settings input:focus { outline: none; border-color: color-mix(in srgb, var(--cyan) 60%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--cyan) 18%, transparent); }
 .settings .btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; margin-top: 4px; }
 .settings a { color: var(--cyan); }
+.seg { display: inline-flex; padding: 3px; gap: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); align-self: flex-start; }
+.seg button { font: inherit; font-size: .88rem; font-weight: 500; color: var(--dim); background: transparent; border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: rgba(255,255,255,.12); color: var(--ink); }
+.seg button:focus-visible { outline: 2px solid color-mix(in srgb, var(--cyan) 60%, transparent); outline-offset: 1px; }
 .routes { display: flex; flex-direction: column; gap: 6px; }
 .routes .hint { font-size: .8rem; color: var(--dim); }
 .route { --c: var(--cyan); display: grid; grid-template-columns: auto 40px minmax(0,1fr); align-items: center; gap: 10px; padding: 8px 10px; border-radius: 14px; background: var(--surface); cursor: pointer; }
@@ -157,26 +161,31 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
 
   <footer>
     <div class="refresh" aria-hidden="true"><i id="bar"></i></div>
-    <span class="status" id="status">Startar…</span>
+    <span class="status" id="status" data-i18n="starting">Startar…</span>
     <div class="foot-right">
-      <span>Skapad av Lisa Hammarlund · Data från Trafiklab.se</span>
-      <button class="gear" id="gear" type="button">Inställningar</button>
+      <span data-i18n="credit">Skapad av Lisa Hammarlund · Data från Trafiklab.se</span>
+      <button class="gear" id="gear" type="button" data-i18n="settings">Inställningar</button>
     </div>
   </footer>
 </div>
 
 <div class="settings" id="settings" hidden role="dialog" aria-labelledby="sh">
-  <h2 id="sh">Inställningar</h2>
-  <p>API-nyckel från <a href="https://developer.trafiklab.se" target="_blank" rel="noopener">developer.trafiklab.se</a> (Trafiklab Realtime APIs). Nyckeln sparas bara i den här webbläsaren.</p>
-  <label class="h" for="keyInput">API-nyckel</label>
+  <h2 id="sh" data-i18n="settings">Inställningar</h2>
+  <label class="h" data-i18n="language">Språk</label>
+  <div class="seg" id="langSeg" role="group" aria-label="Språk / Language">
+    <button type="button" id="langSv" data-lang="sv" lang="sv">Svenska</button>
+    <button type="button" id="langEn" data-lang="en" lang="en">English</button>
+  </div>
+  <p id="intro">API-nyckel från <a href="https://developer.trafiklab.se" target="_blank" rel="noopener">developer.trafiklab.se</a> (Trafiklab Realtime APIs). Nyckeln sparas bara i den här webbläsaren.</p>
+  <label class="h" for="keyInput" data-i18n="keyLabel">API-nyckel</label>
   <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="t.ex. 1a2b3c4d…">
-  <label class="h" for="stopInput">Hållplats (sökord)</label>
+  <label class="h" for="stopInput" data-i18n="stopLabel">Hållplats (sökord)</label>
   <input id="stopInput" type="text" autocomplete="off" value="Karolinska Sjukhuset Biomedicum">
   <div class="btns">
-    <button class="gear" id="cancel" type="button">Stäng</button>
-    <button class="gear" id="save" type="button">Spara och hämta</button>
+    <button class="gear" id="cancel" type="button" data-i18n="close">Stäng</button>
+    <button class="gear" id="save" type="button" data-i18n="save">Spara och hämta</button>
   </div>
-  <label class="h">Linjer och slutstationer</label>
+  <label class="h" data-i18n="routesLabel">Linjer och slutstationer</label>
   <div class="routes" id="routes"></div>
 </div>
 
@@ -208,6 +217,72 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   let mode = "boot";
   let lastFetch = 0;
   let lastHtml = "";
+
+  // Language: Swedish or English, from the phone's language unless chosen in settings
+  const LINK = '<a href="https://developer.trafiklab.se" target="_blank" rel="noopener">developer.trafiklab.se</a>';
+  const T = {
+    sv: {
+      starting: "Startar…", departures: "Avgångar · Buss", example: "Exempeldata · Buss",
+      nextBus: "Nästa buss", now: "Nu", cancelled: "Inställd", live: "realtid", sched: "tidtabell",
+      noDeps: "Inga bussavgångar den närmaste tiden", waiting: "Väntar på data…",
+      liveUpdated: t => "Live · uppdaterad " + t,
+      credit: "Skapad av Lisa Hammarlund · Data från Trafiklab.se",
+      settings: "Inställningar", language: "Språk",
+      intro: "API-nyckel från " + LINK + " (Trafiklab Realtime APIs). Nyckeln sparas bara i den här webbläsaren.",
+      keyLabel: "API-nyckel", keyPh: "t.ex. 1a2b3c4d…", stopLabel: "Hållplats (sökord)",
+      close: "Stäng", save: "Spara och hämta", routesLabel: "Linjer och slutstationer",
+      routesEmpty: "Listan fylls på automatiskt med varje linje och slutstation som hämtas live.",
+      routesHint: "Avmarkera de riktningar du inte vill visa.",
+      noStop: q => "Hittade ingen hållplats för “" + q + "”",
+      needKey: "Lägg in din Trafiklab-nyckel under Inställningar",
+      noConn: "ingen anslutning",
+      keyRejected: m => "Nyckeln godtogs inte (" + m + ") · kontrollera den under Inställningar",
+      couldNotUpdate: w => "Kunde inte uppdatera (" + w + ") · visar senaste",
+      retrying: w => "Hämtar igen om några sekunder… (" + w + ")",
+      blocked: "Live-anrop blockeras här · öppna sidan i webbläsaren",
+      fetching: "Hämtar…", exampleStatus: m => "Exempeldata · " + m, dateLocale: "sv-SE"
+    },
+    en: {
+      starting: "Starting…", departures: "Departures · Bus", example: "Example data · Bus",
+      nextBus: "Next bus", now: "Now", cancelled: "Cancelled", live: "live", sched: "scheduled",
+      noDeps: "No bus departures coming up", waiting: "Waiting for data…",
+      liveUpdated: t => "Live · updated " + t,
+      credit: "Made by Lisa Hammarlund · Data from Trafiklab.se",
+      settings: "Settings", language: "Language",
+      intro: "API key from " + LINK + " (Trafiklab Realtime APIs). The key is only stored in this browser.",
+      keyLabel: "API key", keyPh: "e.g. 1a2b3c4d…", stopLabel: "Stop (search term)",
+      close: "Close", save: "Save and fetch", routesLabel: "Lines and end stations",
+      routesEmpty: "The list fills in automatically with every line and end station fetched live.",
+      routesHint: "Untick the directions you don't want to see.",
+      noStop: q => "No stop found for “" + q + "”",
+      needKey: "Add your Trafiklab key under Settings",
+      noConn: "no connection",
+      keyRejected: m => "Key not accepted (" + m + ") · check it under Settings",
+      couldNotUpdate: w => "Couldn't update (" + w + ") · showing last data",
+      retrying: w => "Retrying in a few seconds… (" + w + ")",
+      blocked: "Live calls are blocked here · open the page in a browser",
+      fetching: "Fetching…", exampleStatus: m => "Example data · " + m, dateLocale: "en-GB"
+    }
+  };
+  let lang = store.get("tl_lang");
+  if (lang !== "sv" && lang !== "en") {
+    const langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""]);
+    lang = /^sv/i.test(langs[0] || "") ? "sv" : "en";
+  }
+  const t = (k, ...a) => { const v = (T[lang] && T[lang][k]) ?? T.sv[k]; return typeof v === "function" ? v(...a) : v; };
+  let statusMake = () => t("starting"), statusKind = "";
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+    $("intro").innerHTML = t("intro");
+    $("keyInput").placeholder = t("keyPh");
+    $("langSv").setAttribute("aria-pressed", String(lang === "sv"));
+    $("langEn").setAttribute("aria-pressed", String(lang === "en"));
+    setStatus(statusMake, statusKind);
+    if (!$("settings").hidden) renderRoutes();
+    lastHtml = "";
+    tick();
+  }
 
   // Header shows the chosen stop: long names split into a small first line and a big last word
   function showStopName(name) {
@@ -254,30 +329,31 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     const items = Object.entries(seen).sort(([, a], [, b]) =>
       String(a.line).localeCompare(String(b.line), "sv", { numeric: true }) || a.dest.localeCompare(b.dest, "sv"));
     if (!items.length) {
-      box.innerHTML = '<div class="hint">Listan fylls på automatiskt med varje linje och slutstation som hämtas live.</div>';
+      box.innerHTML = '<div class="hint">' + esc(t("routesEmpty")) + '</div>';
       return;
     }
-    box.innerHTML = '<div class="hint">Avmarkera de riktningar du inte vill visa.</div>' +
+    box.innerHTML = '<div class="hint">' + esc(t("routesHint")) + '</div>' +
       items.map(([k, r], i) =>
         '<label class="route" for="rt' + i + '" style="--c:' + colorFor(r.line) + '"><input type="checkbox" id="rt' + i + '" data-k="' + esc(k) + '"' + (hidden.has(k) ? "" : " checked") + '>' +
         '<b class="badge">' + esc(r.line) + '</b><span>' + esc(r.dest) + '</span></label>').join("");
   }
 
-  function setStatus(text, kind) {
-    const s = $("status"); s.textContent = text; s.className = "status" + (kind ? " " + kind : "");
+  function setStatus(make, kind) {
+    statusMake = make; statusKind = kind || "";
+    const s = $("status"); s.textContent = make(); s.className = "status" + (kind ? " " + kind : "");
     $("dot").className = "live-dot" + (kind === "demo" ? " demo" : kind === "err" ? " err" : "");
-    $("mode").textContent = kind === "demo" ? "Exempeldata · Buss" : "Avgångar · Buss";
+    $("mode").textContent = kind === "demo" ? t("example") : t("departures");
   }
 
   function parts(d, now) {
     const mins = Math.max(0, Math.floor((d.at.getTime() - now) / 60000));
-    const minsHtml = d.cx ? '<div class="mins">Inställd</div>'
-      : mins < 1 ? '<div class="mins now">Nu</div>'
+    const minsHtml = d.cx ? '<div class="mins">' + t("cancelled") + '</div>'
+      : mins < 1 ? '<div class="mins now">' + t("now") + '</div>'
       : '<div class="mins">' + mins + '<small>min</small></div>';
     const lateMin = Math.round((d.delay || 0) / 60);
     const meta = '<div class="meta"><span>' + hhmm(d.at) + '</span>' +
       (lateMin > 0 ? '<span class="late">+' + lateMin + ' min</span>' : '') +
-      (d.rt ? '<span class="rt">● realtid</span>' : '<span>tidtabell</span>') + '</div>';
+      (d.rt ? '<span class="rt">● ' + t("live") + '</span>' : '<span>' + t("sched") + '</span>') + '</div>';
     return { minsHtml, meta };
   }
 
@@ -286,12 +362,12 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     const list = departures.filter(d => d.at.getTime() > now - 30000 && !hidden.has(routeKey(d))).slice(0, COUNT);
     let html;
     if (!list.length) {
-      html = '<div class="empty">' + (mode === "live" ? "Inga bussavgångar den närmaste tiden" : "Väntar på data…") + "</div>";
+      html = '<div class="empty">' + (mode === "live" ? t("noDeps") : t("waiting")) + "</div>";
     } else {
       const [first, ...rest] = list;
       const f = parts(first, now);
       html = '<section class="hero' + (first.cx ? " cx" : "") + '" style="--c:' + colorFor(first.line) + '">' +
-        '<div class="label">Nästa buss</div>' +
+        '<div class="label">' + t("nextBus") + '</div>' +
         '<div class="badge">' + esc(first.line) + '</div>' +
         '<div style="min-width:0"><div class="name">' + esc(first.dest) + '</div>' + f.meta + '</div>' +
         f.minsHtml + '</section>';
@@ -312,7 +388,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   function tick() {
     const n = new Date();
     $("clock").textContent = hhmm(n);
-    $("date").textContent = n.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "short" });
+    $("date").textContent = n.toLocaleDateString(t("dateLocale"), { weekday: "long", day: "numeric", month: "short" });
     const frac = lastFetch ? Math.min(1, (Date.now() - lastFetch) / REFRESH_MS) : 0;
     $("bar").style.width = (frac * 100).toFixed(1) + "%";
     render();
@@ -343,7 +419,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
         || groups[0] || null;
       if (pick) break;
     }
-    if (!pick) throw new Error("Hittade ingen hållplats för “" + stopQuery + "”");
+    if (!pick) throw new Error(t("noStop", stopQuery));
     stopId = String(pick.id);
     store.set("tl_stopid:" + stopQuery, stopId);
     if (pick.name) { store.set("tl_stopname:" + stopQuery, pick.name); showStopName(pick.name); }
@@ -367,7 +443,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   }
 
   async function load() {
-    if (!apiKey) { demo("Lägg in din Trafiklab-nyckel under Inställningar"); return; }
+    if (!apiKey) { demo(() => t("needKey")); return; }
     try {
       const id = await resolveStop();
       const data = await getJSON(API + "/departures/" + encodeURIComponent(id) + "?key=" + encodeURIComponent(apiKey));
@@ -378,18 +454,20 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
       mode = "live";
       clearTimeout(retryTimer);
       lastFetch = Date.now();
-      setStatus("Live · uppdaterad " + hhmm(new Date()), "");
+      const at = hhmm(new Date());
+      setStatus(() => t("liveUpdated", at), "");
       render();
     } catch (e) {
       const blocked = e instanceof TypeError;
-      const why = blocked ? "ingen anslutning" : e.message;
+      const msg = e.message;
+      const why = () => blocked ? t("noConn") : msg;
       // With a key we never fall back to example data: keep trying instead
       if (/HTTP 40[13]/.test(e.message)) {
-        setStatus("Nyckeln godtogs inte (" + e.message + ") · kontrollera den under Inställningar", "err");
+        setStatus(() => t("keyRejected", msg), "err");
       } else if (mode === "live") {
-        setStatus("Kunde inte uppdatera (" + why + ") · visar senaste", "err");
+        setStatus(() => t("couldNotUpdate", why()), "err");
       } else {
-        setStatus("Hämtar igen om några sekunder… (" + why + ")", "err");
+        setStatus(() => t("retrying", why()), "err");
         clearTimeout(retryTimer);
         retryTimer = setTimeout(load, 5000);
       }
@@ -398,7 +476,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   }
 
   // Clearly-labelled sample so the board shows its working state without live data
-  function demo(msg) {
+  function demo(msgMake) {
     mode = "demo";
     const base = Date.now();
     const s = [["6", "Ropsten", 4, 0], ["3", "Södersjukhuset", 8, 120], ["5", "Liljeholmen", 11, 0], ["3", "Södersjukhuset", 26, 0], ["6", "Ropsten", 34, 0]];
@@ -406,7 +484,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
       const at = new Date(base + m * 60000 + 20000);
       return { line, dest, at, sched: new Date(at - delay * 1000), delay, rt: i < 2, cx: false };
     });
-    setStatus("Exempeldata · " + msg, "demo");
+    setStatus(() => t("exampleStatus", msgMake()), "demo");
     lastFetch = Date.now();
     render();
   }
@@ -437,14 +515,22 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     store.set("tl_stopq", stopQuery);
     mode = "boot";
     close();
-    setStatus("Hämtar…", "");
+    setStatus(() => t("fetching"), "");
     load();
+  });
+
+  $("langSeg").addEventListener("click", e => {
+    const b = e.target.closest("button[data-lang]");
+    if (!b) return;
+    lang = b.dataset.lang;
+    store.set("tl_lang", lang);
+    applyLang();
   });
 
   if (navigator.wakeLock) navigator.wakeLock.request("screen").catch(() => {});
 
   showStopName(store.get("tl_stopname:" + stopQuery) || stopQuery);
-  tick();
+  applyLang();
   load();
   setInterval(tick, 1000);
   setInterval(load, REFRESH_MS);

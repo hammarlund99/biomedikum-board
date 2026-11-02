@@ -288,11 +288,9 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     const now = Date.now();
     const list = departures.filter(d => d.at.getTime() > now - 30000 && !hidden.has(routeKey(d))).slice(0, COUNT);
     const board = $("board");
-    if (!list.length) {
-      board.innerHTML = '<div class="empty">' + (mode === "live" ? "Inga bussavgångar den närmaste tiden" : "Väntar på data…") + "</div>";
-      return;
-    }
-    board.innerHTML = list.map(d => {
+    const html = !list.length
+      ? '<div class="empty">' + (mode === "live" ? "Inga bussavgångar den närmaste tiden" : "Väntar på data…") + "</div>"
+      : list.map(d => {
       const mins = Math.max(0, Math.floor((d.at.getTime() - now) / 60000));
       const eta = d.cx ? '<span class="now" style="animation:none">Inställd</span>'
         : mins < 1 ? '<span class="now">Nu</span>'
@@ -308,7 +306,10 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
         '<div class="dest"><div class="name">' + esc(d.dest) + '</div><div class="meta">' + meta + '</div></div>' +
         '<div class="eta">' + eta + '</div></div>';
     }).join("");
+    // Only touch the screen when something visible changed, so rows never flicker
+    if (html !== lastHtml) { board.innerHTML = html; lastHtml = html; }
   }
+  let lastHtml = "";
 
   function tick() {
     const n = new Date();

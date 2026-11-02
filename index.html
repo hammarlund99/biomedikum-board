@@ -101,7 +101,9 @@ h1 small { display: block; font-size: .42em; font-weight: 600; letter-spacing: .
 }
 .dest { min-width: 0; }
 .dest .name { font-size: clamp(1.25rem, 3.6vw, 3rem); font-weight: 600; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dest .meta { font-family: var(--mono); font-size: clamp(.68rem, 1.1vw, .9rem); color: var(--dim); margin-top: 6px; letter-spacing: .06em; display: flex; gap: 12px; flex-wrap: wrap; }
+.dest .meta { font-family: var(--mono); font-size: clamp(.68rem, 1.1vw, .9rem); color: var(--dim); margin-top: 6px; letter-spacing: .06em; display: flex; gap: 12px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+.dest .meta span { flex-shrink: 0; }
+.dest .meta span:last-child { flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; }
 .meta .late { color: var(--amber); }
 .meta .rt { color: var(--c); }
 .eta { text-align: right; font-family: var(--mono); line-height: 1; }
@@ -315,7 +317,7 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
       const lateMin = Math.round((d.delay || 0) / 60);
       const meta = [
         '<span>' + hhmm(d.at) + '</span>',
-        lateMin > 0 ? '<span class="late">+' + lateMin + ' min (ord. ' + hhmm(d.sched) + ')</span>' : '',
+        lateMin > 0 ? '<span class="late">+' + lateMin + ' min</span>' : '',
         d.rt ? '<span class="rt">◉ realtid</span>' : '<span>tidtabell</span>'
       ].join("");
       return '<div class="row' + (d.cx ? " cx" : "") + '" style="--c:' + colorFor(d.line) + '">' +

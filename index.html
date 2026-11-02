@@ -6,11 +6,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap">
 <style>
-/* Layout: one-screen signage board — header strip, five glowing departure rows, footer ticker. Single committed dark look. */
+/* Layout: "next bus first" — compact header, one large hero card for the next bus, a tight list of the four after it, small footer. Single committed dark look. */
 :root {
   --void: #030308;
   --panel: #0a0a14;
-  --grid: #16162a;
+  --grid: #191930;
   --ink: #eef0ff;
   --dim: #7b7fa6;
   --cyan: #19f0ff;
@@ -21,201 +21,172 @@
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   color-scheme: dark;
 }
-html, body { height: 100%; }
-body {
-  background: var(--void);
-  color: var(--ink);
-  font-family: var(--display);
-  overflow-x: hidden;
-}
+html, body { min-height: 100%; }
+body { background: var(--void); color: var(--ink); font-family: var(--display); overflow-x: hidden; }
 body::after {
-  /* faint scanlines */
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 5;
-  background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px);
 }
 .bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
-    radial-gradient(60% 50% at 10% 0%, rgba(255,43,214,.18), transparent 70%),
-    radial-gradient(50% 60% at 100% 100%, rgba(25,240,255,.16), transparent 70%),
-    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 48px,
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 48px 100%;
-  opacity: .9;
-  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.35) 100%);
+    radial-gradient(70% 40% at 0% 0%, rgba(255,43,214,.16), transparent 70%),
+    radial-gradient(60% 50% at 100% 100%, rgba(25,240,255,.14), transparent 70%),
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 44px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 44px 100%;
+  opacity: .7;
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.3) 100%);
 }
 .wrap {
-  position: relative; z-index: 1;
-  min-height: 100%;
-  display: flex; flex-direction: column; gap: clamp(14px, 2.4vh, 28px);
-  padding-block: clamp(16px, 3vh, 36px);
+  position: relative; z-index: 1; box-sizing: border-box;
+  max-width: 760px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: clamp(12px, 2.2vh, 22px);
+  padding-block: clamp(12px, 2.5vh, 28px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  max-width: 1400px; margin: 0 auto; box-sizing: border-box;
 }
 
-/* Header */
-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.stop-eyebrow {
-  font-family: var(--mono); font-size: .78rem; letter-spacing: .28em; text-transform: uppercase;
-  color: var(--cyan); display: flex; align-items: center; gap: 10px;
-}
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: pulse 1.6s ease-in-out infinite; }
+/* Header: one row at every width */
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.title { min-width: 0; }
+.eyebrow { font-family: var(--mono); font-size: .64rem; letter-spacing: .24em; text-transform: uppercase; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); animation: pulse 1.6s ease-in-out infinite; flex: none; }
 .live-dot.demo { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
 .live-dot.err { background: var(--warn); box-shadow: 0 0 10px var(--warn); animation: none; }
-h1 {
-  margin: 6px 0 0; font-weight: 700; line-height: .95; text-wrap: balance;
-  font-size: clamp(1.9rem, 5.2vw, 4.4rem); letter-spacing: -.01em;
-  background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 55%, var(--magenta) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-h1 small { display: block; font-size: .42em; font-weight: 600; letter-spacing: .02em; color: var(--dim); -webkit-text-fill-color: var(--dim); margin-bottom: .2em; }
-.clock { text-align: right; font-family: var(--mono); }
-.clock .t { font-size: clamp(2rem, 5vw, 4rem); font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(25,240,255,.45); line-height: 1; }
-.clock .d { font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-top: 6px; }
+h1 { margin: 4px 0 0; font-weight: 700; line-height: 1; font-size: clamp(1.6rem, 6vw, 2.6rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+h1 small { display: block; font-size: .46em; font-weight: 600; color: var(--dim); margin-bottom: .15em; }
+h1 .hl { background: linear-gradient(90deg, var(--ink) 50%, var(--magenta)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.clock { text-align: right; font-family: var(--mono); flex: none; }
+.clock .t { font-size: clamp(1.6rem, 6vw, 2.6rem); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; text-shadow: 0 0 18px rgba(25,240,255,.4); }
+.clock .d { font-size: .58rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-top: 5px; }
 
-/* Column labels */
-.cols, .row {
-  display: grid; grid-template-columns: clamp(78px, 11vw, 150px) minmax(0, 1fr) clamp(96px, 14vw, 200px);
-  align-items: center; gap: clamp(12px, 2vw, 28px);
-}
-.cols { font-family: var(--mono); font-size: .72rem; letter-spacing: .3em; text-transform: uppercase; color: var(--dim); padding: 0 clamp(14px, 2vw, 26px); }
-.cols span:last-child { text-align: right; }
+#board { display: flex; flex-direction: column; gap: 14px; }
 
-/* Rows */
-.board { display: flex; flex-direction: column; gap: clamp(8px, 1.4vh, 14px); flex: 1; }
-.row {
-  --c: var(--cyan);
-  position: relative; padding: clamp(12px, 2vh, 22px) clamp(14px, 2vw, 26px);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 14%, var(--panel)) 0%, var(--panel) 45%);
-  border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
-  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-  animation: rise .5s cubic-bezier(.2,.8,.2,1) both;
+/* Shared bits */
+.badge {
+  font-family: var(--mono); font-weight: 800; color: var(--void); background: var(--c);
+  text-align: center; line-height: 1; font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--c) 55%, transparent);
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
-.row:nth-child(2){animation-delay:.06s}.row:nth-child(3){animation-delay:.12s}.row:nth-child(4){animation-delay:.18s}.row:nth-child(5){animation-delay:.24s}
-.line {
-  font-family: var(--mono); font-weight: 800; font-size: clamp(1.6rem, 4.4vw, 3.6rem); line-height: 1;
-  color: var(--void); background: var(--c); text-align: center; padding: .16em .2em;
-  box-shadow: 0 0 24px color-mix(in srgb, var(--c) 60%, transparent), inset 0 0 0 2px rgba(255,255,255,.25);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-  font-variant-numeric: tabular-nums;
-}
-.dest { min-width: 0; }
-.dest .name { font-size: clamp(1.25rem, 3.6vw, 3rem); font-weight: 600; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dest .meta { font-family: var(--mono); font-size: clamp(.68rem, 1.1vw, .9rem); color: var(--dim); margin-top: 6px; letter-spacing: .06em; display: flex; gap: 12px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
-.dest .meta span { flex-shrink: 0; }
-.dest .meta span:last-child { flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; }
+.name { font-weight: 600; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meta { font-family: var(--mono); color: var(--dim); letter-spacing: .05em; display: flex; gap: 10px; white-space: nowrap; overflow: hidden; }
+.meta span { flex: none; }
 .meta .late { color: var(--amber); }
 .meta .rt { color: var(--c); }
-.eta { text-align: right; font-family: var(--mono); line-height: 1; }
-.eta .n { font-size: clamp(2.2rem, 6.4vw, 5.4rem); font-weight: 800; color: var(--c); text-shadow: 0 0 26px color-mix(in srgb, var(--c) 70%, transparent); font-variant-numeric: tabular-nums; }
-.eta .u { font-size: clamp(.7rem, 1.2vw, 1rem); letter-spacing: .25em; color: var(--dim); margin-left: 4px; }
-.eta .now { font-size: clamp(1.6rem, 4.6vw, 3.8rem); font-weight: 800; color: var(--c); animation: blink 1s steps(2, start) infinite; text-shadow: 0 0 26px var(--c); }
-.row.cx { --c: var(--warn); opacity: .75; }
-.row.cx .name { text-decoration: line-through; text-decoration-thickness: 2px; }
+.mins { font-family: var(--mono); font-weight: 800; color: var(--c); font-variant-numeric: tabular-nums; line-height: 1; text-align: right; white-space: nowrap; }
+.mins small { font-size: .32em; font-weight: 600; letter-spacing: .14em; color: var(--dim); margin-left: 3px; }
+.mins.now { animation: blink 1s steps(2, start) infinite; }
 
-.empty { font-family: var(--mono); color: var(--dim); padding: 40px 20px; text-align: center; border: 1px dashed var(--grid); letter-spacing: .1em; }
+/* Hero: the next bus */
+.hero {
+  --c: var(--cyan);
+  position: relative; padding: clamp(14px, 3vw, 22px);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 20%, var(--panel)) 0%, var(--panel) 60%);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 14px; row-gap: 10px; align-items: center;
+}
+.hero .label { grid-column: 1 / -1; font-family: var(--mono); font-size: .62rem; letter-spacing: .3em; text-transform: uppercase; color: var(--c); }
+.hero .badge { font-size: clamp(1.7rem, 7vw, 2.6rem); padding: .16em .32em; min-width: 1.6em; }
+.hero .name { font-size: clamp(1.35rem, 5.4vw, 2.1rem); }
+.hero .meta { font-size: .7rem; margin-top: 5px; }
+.hero .mins { font-size: clamp(3rem, 14vw, 5rem); text-shadow: 0 0 26px color-mix(in srgb, var(--c) 65%, transparent); }
+.hero.cx { --c: var(--warn); }
+.hero.cx .name { text-decoration: line-through; }
+
+/* List: the four after it */
+.list { display: flex; flex-direction: column; border-top: 1px solid var(--grid); }
+.item {
+  --c: var(--cyan);
+  display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; column-gap: 12px; align-items: center;
+  padding: 9px 4px; border-bottom: 1px solid var(--grid);
+}
+.item .badge { font-size: 1.05rem; padding: .32em 0; }
+.item .name { font-size: 1.05rem; }
+.item .meta { font-size: .62rem; margin-top: 3px; }
+.item .mins { font-size: 1.7rem; }
+.item.cx .name { text-decoration: line-through; color: var(--dim); }
+.item.cx { --c: var(--warn); }
+
+.empty { font-family: var(--mono); color: var(--dim); padding: 32px 16px; text-align: center; border: 1px dashed var(--grid); letter-spacing: .08em; font-size: .8rem; }
 
 /* Footer */
-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; font-family: var(--mono); font-size: .74rem; color: var(--dim); letter-spacing: .08em; }
-.refresh { flex: 1 1 220px; height: 3px; background: var(--grid); position: relative; overflow: hidden; max-width: 420px; }
-.refresh i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--magenta), var(--cyan)); box-shadow: 0 0 10px var(--cyan); }
+footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; font-family: var(--mono); font-size: .64rem; color: var(--dim); letter-spacing: .06em; }
+.refresh { flex-basis: 100%; height: 2px; background: var(--grid); position: relative; overflow: hidden; }
+.refresh i { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, var(--magenta), var(--cyan)); box-shadow: 0 0 8px var(--cyan); }
 .status { color: var(--ink); }
 .status.demo { color: var(--amber); }
 .status.err { color: var(--warn); }
+.foot-right { display: flex; align-items: center; gap: 12px; }
 button.gear {
   font: inherit; color: var(--cyan); background: transparent; border: 1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
-  padding: 6px 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer;
+  padding: 5px 10px; letter-spacing: .16em; text-transform: uppercase; cursor: pointer;
 }
 button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, var(--cyan) 14%, transparent); outline: none; box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 50%, transparent); }
 
-/* Settings drawer */
+/* Settings */
 .settings {
   position: fixed; z-index: 10; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(520px, calc(100% - 32px)); box-sizing: border-box;
-  background: var(--panel); border: 1px solid var(--magenta); padding: 22px;
+  width: min(520px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; box-sizing: border-box;
+  background: var(--panel); border: 1px solid var(--magenta); padding: 20px;
   box-shadow: 0 0 60px rgba(255,43,214,.25);
   font-family: var(--mono); display: flex; flex-direction: column; gap: 12px;
 }
-.settings h2 { margin: 0; font-family: var(--display); font-size: 1.3rem; color: var(--ink); }
-.settings p { margin: 0; font-size: .82rem; color: var(--dim); line-height: 1.55; }
-.settings label { font-size: .7rem; letter-spacing: .25em; text-transform: uppercase; color: var(--magenta); }
-.settings input {
+.settings h2 { margin: 0; font-family: var(--display); font-size: 1.25rem; }
+.settings p { margin: 0; font-size: .8rem; color: var(--dim); line-height: 1.55; }
+.settings label.h { font-size: .68rem; letter-spacing: .24em; text-transform: uppercase; color: var(--magenta); }
+.settings input[type=text], .settings input[type=password] {
   font: inherit; font-size: .95rem; color: var(--ink); background: var(--void); border: 1px solid var(--grid);
   padding: 10px 12px; width: 100%; box-sizing: border-box;
 }
 .settings input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(25,240,255,.25); }
 .settings .btns { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 .settings a { color: var(--cyan); }
-.settings { max-height: calc(100% - 32px); overflow-y: auto; }
 .routes { display: flex; flex-direction: column; gap: 6px; }
-.routes .hint { font-size: .78rem; color: var(--dim); }
-.route { display: grid; grid-template-columns: auto 52px minmax(0,1fr) auto; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--grid); cursor: pointer; }
-.route:hover { border-color: color-mix(in srgb, var(--cyan) 50%, transparent); }
+.routes .hint { font-size: .76rem; color: var(--dim); }
+.route { --c: var(--cyan); display: grid; grid-template-columns: auto 46px minmax(0,1fr); align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--grid); cursor: pointer; }
 .route input { accent-color: var(--cyan); width: 18px; height: 18px; margin: 0; }
-.route b { font-weight: 800; color: var(--void); text-align: center; padding: 2px 0; }
-.route span { color: var(--ink); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.route em { font-style: normal; font-size: .72rem; color: var(--dim); letter-spacing: .08em; }
+.route .badge { font-size: .9rem; padding: .3em 0; box-shadow: none; }
+.route span { font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .route:has(input:not(:checked)) { opacity: .45; }
 .route:has(input:not(:checked)) span { text-decoration: line-through; }
 
 @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
 @keyframes blink { to { opacity: .35; } }
-@keyframes rise { from { opacity: .3; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
-
-/* Phone: everything fits one screen, also as a home-screen app */
-@media (max-width: 560px) {
-  .wrap { gap: 12px; padding-block: 12px; height: 100%; min-height: 0; }
-  header { flex-wrap: nowrap; align-items: center; }
-  .stop-eyebrow { font-size: .62rem; letter-spacing: .2em; gap: 8px; }
-  h1 { font-size: 1.9rem; margin-top: 4px; }
-  h1 small { font-size: .5em; }
-  .clock .t { font-size: 1.9rem; }
-  .clock .d { font-size: .58rem; letter-spacing: .14em; margin-top: 4px; }
-  .cols { display: none; }
-  .board { gap: 8px; flex: 1 1 auto; display: grid; grid-auto-rows: minmax(64px, 1fr); }
-  .row { grid-template-columns: 54px minmax(0,1fr) auto; gap: 12px; padding: 10px 12px; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
-  .line { font-size: 1.45rem; }
-  .dest .name { font-size: 1.2rem; }
-  .dest .meta { font-size: .66rem; margin-top: 3px; gap: 8px; }
-  .eta .n { font-size: 2.1rem; }
-  .eta .u { font-size: .62rem; letter-spacing: .15em; }
-  .eta .now { font-size: 1.5rem; }
-  footer { font-size: .64rem; gap: 8px 12px; }
-  .refresh { flex-basis: 100%; max-width: none; order: -1; }
-  button.gear { padding: 5px 10px; }
-}
 </style>
 
 <div class="bg" aria-hidden="true"></div>
 <div class="wrap">
   <header>
-    <div>
-      <div class="stop-eyebrow"><span class="live-dot" id="dot"></span><span id="mode">Avgångar · Buss</span></div>
-      <h1><small>Karolinska Sjukhuset</small>Biomedikum</h1>
+    <div class="title">
+      <div class="eyebrow"><span class="live-dot" id="dot"></span><span id="mode">Avgångar · Buss</span></div>
+      <h1><small>Karolinska Sjukhuset</small><span class="hl">Biomedikum</span></h1>
     </div>
     <div class="clock"><div class="t" id="clock">--:--</div><div class="d" id="date"></div></div>
   </header>
 
-  <div class="cols" aria-hidden="true"><span>Linje</span><span>Mot</span><span>Avgår</span></div>
-  <main class="board" id="board" aria-live="polite"></main>
+  <main id="board" aria-live="polite"></main>
 
   <footer>
-    <span class="status" id="status">Startar…</span>
     <div class="refresh" aria-hidden="true"><i id="bar"></i></div>
-    <span>Data från Trafiklab.se</span>
-    <button class="gear" id="gear" type="button">Inställningar</button>
+    <span class="status" id="status">Startar…</span>
+    <div class="foot-right">
+      <span>Data från Trafiklab.se</span>
+      <button class="gear" id="gear" type="button">Inställningar</button>
+    </div>
   </footer>
 </div>
 
 <div class="settings" id="settings" hidden role="dialog" aria-labelledby="sh">
-  <h2 id="sh">Trafiklab API-nyckel</h2>
-  <p>Skapa ett projekt på <a href="https://developer.trafiklab.se" target="_blank" rel="noopener">developer.trafiklab.se</a> och lägg till <b>Trafiklab Realtime APIs</b>. Nyckeln sparas bara i den här webbläsaren.</p>
-  <label for="keyInput">API-nyckel</label>
+  <h2 id="sh">Inställningar</h2>
+  <p>API-nyckel från <a href="https://developer.trafiklab.se" target="_blank" rel="noopener">developer.trafiklab.se</a> (Trafiklab Realtime APIs). Nyckeln sparas bara i den här webbläsaren.</p>
+  <label class="h" for="keyInput">API-nyckel</label>
   <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="t.ex. 1a2b3c4d…">
-  <label for="stopInput">Hållplats (sökord)</label>
+  <label class="h" for="stopInput">Hållplats (sökord)</label>
   <input id="stopInput" type="text" autocomplete="off" value="Karolinska Sjukhuset Biomedikum">
-  <label>Linjer och slutstationer</label>
+  <label class="h">Linjer och slutstationer</label>
   <div class="routes" id="routes"></div>
   <div class="btns">
     <button class="gear" id="cancel" type="button">Stäng</button>
@@ -226,9 +197,9 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
 <script>
 (() => {
   const API = "https://realtime-api.trafiklab.se/v1";
-  const REFRESH_MS = 60000;           // Bronze key: 25 calls/min, 100k/month — once a minute is ~43k/month
+  const REFRESH_MS = 60000;          // ~43k calls/month, inside the free Bronze quota
   const COUNT = 5;
-  const ONLY_PLATFORM = "2";        // show departures from this stop position only
+  const ONLY_PLATFORM = "2";         // show departures from this stop position only
   const PALETTE = ["#19f0ff", "#ff2bd6", "#b6ff3b", "#ffb81c", "#8a7dff", "#ff6b3d", "#3dffa8", "#ff4f8b"];
 
   const $ = id => document.getElementById(id);
@@ -238,17 +209,31 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     del(k) { try { localStorage.removeItem(k); } catch {} }
   };
 
-  // Key can also come from ?key= when the file is opened on a signage screen
   let urlKey = null;
   try { urlKey = new URLSearchParams(location.search).get("key"); } catch {}
   let apiKey = urlKey || store.get("tl_key") || "";
   let stopQuery = store.get("tl_stopq") || "Karolinska Sjukhuset Biomedikum";
   let stopId = store.get("tl_stopid:" + stopQuery) || null;
-  let departures = [];   // {line, dest, at: Date, sched: Date, delay, rt, cx}
+  let departures = [];
   let mode = "boot";
   let lastFetch = 0;
-  let stopName = store.get("tl_stopname:" + stopQuery) || "";
-  // Every line + end station seen in live data, and the ones the viewer has switched off
+  let lastHtml = "";
+
+  const colorFor = line => {
+    let h = 0; for (const ch of String(line)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return PALETTE[h % PALETTE.length];
+  };
+  const pad = n => String(n).padStart(2, "0");
+  const hhmm = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
+  const parseLocal = s => {
+    if (!s) return null;
+    const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+    if (!m) return new Date(s);
+    return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+  };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // Line + end station toggles
   const routeKey = d => d.line + "|" + d.dest;
   let seen = {};
   try { seen = JSON.parse(store.get("tl_seen") || "{}") || {}; } catch { seen = {}; }
@@ -258,12 +243,7 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     let changed = false;
     for (const d of list) {
       const k = routeKey(d);
-      const plat = d.plat || "";
-      if (!seen[k] || (plat && !seen[k].plats.includes(plat))) {
-        seen[k] = seen[k] || { line: d.line, dest: d.dest, plats: [] };
-        if (plat && !seen[k].plats.includes(plat)) seen[k].plats.push(plat);
-        changed = true;
-      }
+      if (!seen[k]) { seen[k] = { line: d.line, dest: d.dest }; changed = true; }
     }
     if (changed) store.set("tl_seen", JSON.stringify(seen));
   }
@@ -272,68 +252,65 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     const items = Object.entries(seen).sort(([, a], [, b]) =>
       String(a.line).localeCompare(String(b.line), "sv", { numeric: true }) || a.dest.localeCompare(b.dest, "sv"));
     if (!items.length) {
-      box.innerHTML = '<div class="hint">Listan fylls på automatiskt med varje linje och slutstation som hämtas live. Lägg in API-nyckeln först.</div>';
+      box.innerHTML = '<div class="hint">Listan fylls på automatiskt med varje linje och slutstation som hämtas live.</div>';
       return;
     }
     box.innerHTML = '<div class="hint">Avmarkera de riktningar du inte vill visa.</div>' +
       items.map(([k, r], i) =>
-        '<label class="route" for="rt' + i + '"><input type="checkbox" id="rt' + i + '" data-k="' + esc(k) + '"' + (hidden.has(k) ? "" : " checked") + '>' +
-        '<b style="background:' + colorFor(r.line) + '">' + esc(r.line) + '</b><span>' + esc(r.dest) + '</span>' +
-        '<em></em></label>').join("");
+        '<label class="route" for="rt' + i + '" style="--c:' + colorFor(r.line) + '"><input type="checkbox" id="rt' + i + '" data-k="' + esc(k) + '"' + (hidden.has(k) ? "" : " checked") + '>' +
+        '<b class="badge">' + esc(r.line) + '</b><span>' + esc(r.dest) + '</span></label>').join("");
   }
-
-  const colorFor = line => {
-    let h = 0; for (const ch of String(line)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-    return PALETTE[h % PALETTE.length];
-  };
-  const pad = n => String(n).padStart(2, "0");
-  const hhmm = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
-  // API times are local Swedish time without offset; parse as local
-  const parseLocal = s => {
-    if (!s) return null;
-    const m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
-    if (!m) return new Date(s);
-    return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
-  };
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   function setStatus(text, kind) {
     const s = $("status"); s.textContent = text; s.className = "status" + (kind ? " " + kind : "");
-    const d = $("dot"); d.className = "live-dot" + (kind === "demo" ? " demo" : kind === "err" ? " err" : "");
+    $("dot").className = "live-dot" + (kind === "demo" ? " demo" : kind === "err" ? " err" : "");
     $("mode").textContent = kind === "demo" ? "Exempeldata · Buss" : "Avgångar · Buss";
+  }
+
+  function parts(d, now) {
+    const mins = Math.max(0, Math.floor((d.at.getTime() - now) / 60000));
+    const minsHtml = d.cx ? '<div class="mins">Inställd</div>'
+      : mins < 1 ? '<div class="mins now">Nu</div>'
+      : '<div class="mins">' + mins + '<small>min</small></div>';
+    const lateMin = Math.round((d.delay || 0) / 60);
+    const meta = '<div class="meta"><span>' + hhmm(d.at) + '</span>' +
+      (lateMin > 0 ? '<span class="late">+' + lateMin + ' min</span>' : '') +
+      (d.rt ? '<span class="rt">◉ realtid</span>' : '<span>tidtabell</span>') + '</div>';
+    return { minsHtml, meta };
   }
 
   function render() {
     const now = Date.now();
     const list = departures.filter(d => d.at.getTime() > now - 30000 && !hidden.has(routeKey(d))).slice(0, COUNT);
-    const board = $("board");
-    const html = !list.length
-      ? '<div class="empty">' + (mode === "live" ? "Inga bussavgångar den närmaste tiden" : "Väntar på data…") + "</div>"
-      : list.map(d => {
-      const mins = Math.max(0, Math.floor((d.at.getTime() - now) / 60000));
-      const eta = d.cx ? '<span class="now" style="animation:none">Inställd</span>'
-        : mins < 1 ? '<span class="now">Nu</span>'
-        : '<span class="n">' + mins + '</span><span class="u">min</span>';
-      const lateMin = Math.round((d.delay || 0) / 60);
-      const meta = [
-        '<span>' + hhmm(d.at) + '</span>',
-        lateMin > 0 ? '<span class="late">+' + lateMin + ' min</span>' : '',
-        d.rt ? '<span class="rt">◉ realtid</span>' : '<span>tidtabell</span>'
-      ].join("");
-      return '<div class="row' + (d.cx ? " cx" : "") + '" style="--c:' + colorFor(d.line) + '">' +
-        '<div class="line">' + esc(d.line) + '</div>' +
-        '<div class="dest"><div class="name">' + esc(d.dest) + '</div><div class="meta">' + meta + '</div></div>' +
-        '<div class="eta">' + eta + '</div></div>';
-    }).join("");
-    // Only touch the screen when something visible changed, so rows never flicker
-    if (html !== lastHtml) { board.innerHTML = html; lastHtml = html; }
+    let html;
+    if (!list.length) {
+      html = '<div class="empty">' + (mode === "live" ? "Inga bussavgångar den närmaste tiden" : "Väntar på data…") + "</div>";
+    } else {
+      const [first, ...rest] = list;
+      const f = parts(first, now);
+      html = '<section class="hero' + (first.cx ? " cx" : "") + '" style="--c:' + colorFor(first.line) + '">' +
+        '<div class="label">Nästa buss</div>' +
+        '<div class="badge">' + esc(first.line) + '</div>' +
+        '<div style="min-width:0"><div class="name">' + esc(first.dest) + '</div>' + f.meta + '</div>' +
+        f.minsHtml + '</section>';
+      if (rest.length) {
+        html += '<div class="list">' + rest.map(d => {
+          const p = parts(d, now);
+          return '<div class="item' + (d.cx ? " cx" : "") + '" style="--c:' + colorFor(d.line) + '">' +
+            '<div class="badge">' + esc(d.line) + '</div>' +
+            '<div style="min-width:0"><div class="name">' + esc(d.dest) + '</div>' + p.meta + '</div>' +
+            p.minsHtml + '</div>';
+        }).join("") + '</div>';
+      }
+    }
+    // Only touch the screen when something visible changed
+    if (html !== lastHtml) { $("board").innerHTML = html; lastHtml = html; }
   }
-  let lastHtml = "";
 
   function tick() {
     const n = new Date();
     $("clock").textContent = hhmm(n);
-    $("date").textContent = n.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" });
+    $("date").textContent = n.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "short" });
     const frac = lastFetch ? Math.min(1, (Date.now() - lastFetch) / REFRESH_MS) : 0;
     $("bar").style.width = (frac * 100).toFixed(1) + "%";
     render();
@@ -362,26 +339,22 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     }
     if (!pick) throw new Error("Hittade ingen hållplats för “" + stopQuery + "”");
     stopId = String(pick.id);
-    stopName = pick.name || "";
-    store.set("tl_stopname:" + stopQuery, stopName);
     store.set("tl_stopid:" + stopQuery, stopId);
     return stopId;
   }
 
   function normalize(dep) {
     const route = dep.route || {};
-    const mode = (route.transport_mode || "").toUpperCase();
     const sched = parseLocal(dep.scheduled || dep.scheduledDeparture);
     const real = parseLocal(dep.realtime || dep.realtimeDeparture) || sched;
     return {
-      mode,
+      mode: (route.transport_mode || "").toUpperCase(),
       line: route.designation || route.name || "?",
       dest: route.direction || (route.destination && route.destination.name) || "—",
       at: real, sched,
       delay: dep.delay ?? dep.departureDelay ?? 0,
       rt: !!dep.is_realtime,
       plat: (dep.realtime_platform && dep.realtime_platform.designation) || (dep.scheduled_platform && dep.scheduled_platform.designation) || "",
-      stopName: (dep.stop && dep.stop.name) || stopName || "",
       cx: !!(dep.canceled ?? dep.departureCanceled)
     };
   }
@@ -401,11 +374,11 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
       setStatus("Live · uppdaterad " + hhmm(new Date()), "");
       render();
     } catch (e) {
-      const blocked = e instanceof TypeError;   // network/CSP/CORS failure
+      const blocked = e instanceof TypeError;
       if (mode === "live") {
         setStatus("Kunde inte uppdatera (" + (blocked ? "nätverket blockerat" : e.message) + ") · visar senaste", "err");
       } else {
-        demo(blocked ? "Live-anrop blockeras här · öppna HTML-filen på skärmen" : "Fel: " + e.message);
+        demo(blocked ? "Live-anrop blockeras här · öppna sidan i webbläsaren" : "Fel: " + e.message);
       }
       lastFetch = Date.now();
     }
@@ -415,10 +388,10 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
   function demo(msg) {
     mode = "demo";
     const base = Date.now();
-    const s = [["3", "Södersjukhuset", 2, 0], ["3", "Karolinska institutet", 6, 60], ["507", "Karolinska sjukhuset", 9, 0], ["3", "Södersjukhuset", 12, 120], ["507", "Odenplan", 17, 0]];
-    departures = s.map(([line, dest, m, delay]) => {
+    const s = [["6", "Ropsten", 4, 0], ["3", "Södersjukhuset", 8, 120], ["5", "Liljeholmen", 11, 0], ["3", "Södersjukhuset", 26, 0], ["6", "Ropsten", 34, 0]];
+    departures = s.map(([line, dest, m, delay], i) => {
       const at = new Date(base + m * 60000 + 20000);
-      return { line, dest, at, sched: new Date(at - delay * 1000), delay, rt: true, cx: false };
+      return { line, dest, at, sched: new Date(at - delay * 1000), delay, rt: i < 2, cx: false, plat: ONLY_PLATFORM };
     });
     setStatus("Exempeldata · " + msg, "demo");
     lastFetch = Date.now();
@@ -427,6 +400,10 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
 
   // Settings
   const open = () => { $("keyInput").value = apiKey; $("stopInput").value = stopQuery; renderRoutes(); $("settings").hidden = false; $("keyInput").focus(); };
+  const close = () => { $("settings").hidden = true; $("gear").focus(); };
+  $("gear").addEventListener("click", open);
+  $("cancel").addEventListener("click", close);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("settings").hidden) close(); });
   $("routes").addEventListener("change", e => {
     const k = e.target.dataset && e.target.dataset.k;
     if (!k) return;
@@ -434,10 +411,6 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     store.set("tl_hidden", JSON.stringify([...hidden]));
     render();
   });
-  const close = () => { $("settings").hidden = true; $("gear").focus(); };
-  $("gear").addEventListener("click", open);
-  $("cancel").addEventListener("click", close);
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("settings").hidden) close(); });
   $("save").addEventListener("click", () => {
     apiKey = $("keyInput").value.trim();
     const q = $("stopInput").value.trim() || "Karolinska Sjukhuset Biomedikum";
@@ -453,7 +426,6 @@ button.gear:hover, button.gear:focus-visible { background: color-mix(in srgb, va
     load();
   });
 
-  // Keep the signage screen awake when allowed
   if (navigator.wakeLock) navigator.wakeLock.request("screen").catch(() => {});
 
   tick();

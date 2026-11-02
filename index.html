@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Biomedikum"><meta name="theme-color" content="#07070d"><style>html{background:#07070d}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
-<title>Biomedikum Departures</title>
+<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Biomedicum"><meta name="theme-color" content="#07070d"><style>html{background:#07070d}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
+<title>Biomedicum Departures</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,7 +148,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   <header>
     <div class="title">
       <div class="eyebrow"><span class="live-dot" id="dot"></span><span id="mode">Avgångar · Buss</span></div>
-      <h1><small>Karolinska Sjukhuset</small><span class="hl">Biomedikum</span></h1>
+      <h1><small>Karolinska Sjukhuset</small><span class="hl">Biomedicum</span></h1>
     </div>
     <div class="clock"><div class="t" id="clock">--:--</div><div class="d" id="date"></div></div>
   </header>
@@ -171,7 +171,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   <label class="h" for="keyInput">API-nyckel</label>
   <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="t.ex. 1a2b3c4d…">
   <label class="h" for="stopInput">Hållplats (sökord)</label>
-  <input id="stopInput" type="text" autocomplete="off" value="Karolinska Sjukhuset Biomedikum">
+  <input id="stopInput" type="text" autocomplete="off" value="Karolinska Sjukhuset Biomedicum">
   <label class="h">Linjer och slutstationer</label>
   <div class="routes" id="routes"></div>
   <div class="btns">
@@ -201,7 +201,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   if (urlKey) store.set("tl_key", urlKey);
   let apiKey = urlKey || store.get("tl_key") || "";
   let retryTimer = null;
-  let stopQuery = store.get("tl_stopq") || "Karolinska Sjukhuset Biomedikum";
+  let stopQuery = store.get("tl_stopq") || "Karolinska Sjukhuset Biomedicum";
   let stopId = store.get("tl_stopid:" + stopQuery) || null;
   let departures = [];
   let mode = "boot";
@@ -409,7 +409,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   });
   $("save").addEventListener("click", () => {
     apiKey = $("keyInput").value.trim();
-    const q = $("stopInput").value.trim() || "Karolinska Sjukhuset Biomedikum";
+    const q = $("stopInput").value.trim() || "Karolinska Sjukhuset Biomedicum";
     if (q !== stopQuery) {
       stopQuery = q; stopId = store.get("tl_stopid:" + q) || null;
       seen = {}; hidden = new Set(); store.del("tl_seen"); store.del("tl_hidden");

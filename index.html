@@ -197,9 +197,11 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
 
   let urlKey = null;
   try { urlKey = new URLSearchParams(location.search).get("key"); } catch {}
-  // A key in the link (?key=…) is saved, so later reloads without it still work
-  if (urlKey) store.set("tl_key", urlKey);
-  let apiKey = urlKey || store.get("tl_key") || "";
+  // A key typed under Inställningar always wins over a key in the link (?key=…),
+  // so an old link on the home screen can't override it
+  const manualKey = store.get("tl_key_manual") ? store.get("tl_key") : null;
+  if (urlKey && !manualKey) store.set("tl_key", urlKey);
+  let apiKey = manualKey || urlKey || store.get("tl_key") || "";
   let retryTimer = null;
   let stopQuery = store.get("tl_stopq") || "Karolinska Sjukhuset Biomedicum";
   let stopId = store.get("tl_stopid:" + stopQuery) || null;
@@ -307,7 +309,11 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
 
   async function getJSON(url) {
     const r = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!r.ok) throw new Error("HTTP " + r.status);
+    if (!r.ok) {
+      let detail = "";
+      try { const t = await r.text(); detail = (JSON.parse(t).message || t || "").toString().slice(0, 80); } catch {}
+      throw new Error("HTTP " + r.status + (detail ? ": " + detail : ""));
+    }
     return r.json();
   }
 
@@ -414,7 +420,8 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
       stopQuery = q; stopId = store.get("tl_stopid:" + q) || null;
       seen = {}; hidden = new Set(); store.del("tl_seen"); store.del("tl_hidden");
     }
-    apiKey ? store.set("tl_key", apiKey) : store.del("tl_key");
+    if (apiKey) { store.set("tl_key", apiKey); store.set("tl_key_manual", "1"); }
+    else { store.del("tl_key"); store.del("tl_key_manual"); }
     store.set("tl_stopq", stopQuery);
     mode = "boot";
     close();

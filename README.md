@@ -1,2 +1,2 @@
-# biomedikum-board
-Departure board: Biomedikum
+# departure-board
+Departure board: Sweden

@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Biomedicum"><meta name="theme-color" content="#07070d"><style>html{background:#07070d}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
-<title>Biomedicum Departures</title>
+<html lang="sv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="apple-mobile-web-app-title" content="Departure Board"><meta name="application-name" content="Departure Board"><meta name="theme-color" content="#07070d"><style>html{background:#07070d}body{margin:0;font:14px system-ui,sans-serif}[hidden]{display:none!important}</style></head><body>
+<title>Departure Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,7 +148,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   <header>
     <div class="title">
       <div class="eyebrow"><span class="live-dot" id="dot"></span><span id="mode">Avgångar · Buss</span></div>
-      <h1><small>Karolinska Sjukhuset</small><span class="hl">Biomedicum</span></h1>
+      <h1><small id="stopPre">Karolinska Sjukhuset</small><span class="hl" id="stopMain">Biomedicum</span></h1>
     </div>
     <div class="clock"><div class="t" id="clock">--:--</div><div class="d" id="date"></div></div>
   </header>
@@ -159,7 +159,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     <div class="refresh" aria-hidden="true"><i id="bar"></i></div>
     <span class="status" id="status">Startar…</span>
     <div class="foot-right">
-      <span>Data från Trafiklab.se</span>
+      <span>Skapad av Lisa Hammarlund · Data från Trafiklab.se</span>
       <button class="gear" id="gear" type="button">Inställningar</button>
     </div>
   </footer>
@@ -172,12 +172,12 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="t.ex. 1a2b3c4d…">
   <label class="h" for="stopInput">Hållplats (sökord)</label>
   <input id="stopInput" type="text" autocomplete="off" value="Karolinska Sjukhuset Biomedicum">
-  <label class="h">Linjer och slutstationer</label>
-  <div class="routes" id="routes"></div>
   <div class="btns">
     <button class="gear" id="cancel" type="button">Stäng</button>
     <button class="gear" id="save" type="button">Spara och hämta</button>
   </div>
+  <label class="h">Linjer och slutstationer</label>
+  <div class="routes" id="routes"></div>
 </div>
 
 <script>
@@ -185,7 +185,6 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   const API = "https://realtime-api.trafiklab.se/v1";
   const REFRESH_MS = 60000;          // ~43k calls/month, inside the free Bronze quota
   const COUNT = 7;
-  const ONLY_PLATFORM = "2";         // show departures from this stop position only
   const PALETTE = ["#19f0ff", "#ff2bd6", "#b6ff3b", "#ffb81c", "#8a7dff", "#ff6b3d", "#3dffa8", "#ff4f8b"];
 
   const $ = id => document.getElementById(id);
@@ -209,6 +208,18 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
   let mode = "boot";
   let lastFetch = 0;
   let lastHtml = "";
+
+  // Header shows the chosen stop: long names split into a small first line and a big last word
+  function showStopName(name) {
+    const words = String(name || "").trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return;
+    const pre = words.length >= 3 ? words.slice(0, -1).join(" ") : "";
+    const main = words.length >= 3 ? words[words.length - 1] : words.join(" ");
+    $("stopPre").textContent = pre;
+    $("stopPre").hidden = !pre;
+    $("stopMain").textContent = main;
+    try { document.title = "Departure Board · " + words.join(" "); } catch {}
+  }
 
   const colorFor = line => {
     let h = 0; for (const ch of String(line)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
@@ -335,6 +346,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     if (!pick) throw new Error("Hittade ingen hållplats för “" + stopQuery + "”");
     stopId = String(pick.id);
     store.set("tl_stopid:" + stopQuery, stopId);
+    if (pick.name) { store.set("tl_stopname:" + stopQuery, pick.name); showStopName(pick.name); }
     return stopId;
   }
 
@@ -361,7 +373,6 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
       const data = await getJSON(API + "/departures/" + encodeURIComponent(id) + "?key=" + encodeURIComponent(apiKey));
       departures = (data.departures || []).map(normalize)
         .filter(d => d.at && (d.mode === "BUS" || d.mode === ""))
-        .filter(d => String(d.plat).trim() === ONLY_PLATFORM)
         .sort((a, b) => a.at - b.at);
       remember(departures);
       mode = "live";
@@ -393,7 +404,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     const s = [["6", "Ropsten", 4, 0], ["3", "Södersjukhuset", 8, 120], ["5", "Liljeholmen", 11, 0], ["3", "Södersjukhuset", 26, 0], ["6", "Ropsten", 34, 0]];
     departures = s.map(([line, dest, m, delay], i) => {
       const at = new Date(base + m * 60000 + 20000);
-      return { line, dest, at, sched: new Date(at - delay * 1000), delay, rt: i < 2, cx: false, plat: ONLY_PLATFORM };
+      return { line, dest, at, sched: new Date(at - delay * 1000), delay, rt: i < 2, cx: false };
     });
     setStatus("Exempeldata · " + msg, "demo");
     lastFetch = Date.now();
@@ -418,6 +429,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
     const q = $("stopInput").value.trim() || "Karolinska Sjukhuset Biomedicum";
     if (q !== stopQuery) {
       stopQuery = q; stopId = store.get("tl_stopid:" + q) || null;
+      showStopName(store.get("tl_stopname:" + q) || q);
       seen = {}; hidden = new Set(); store.del("tl_seen"); store.del("tl_hidden");
     }
     if (apiKey) { store.set("tl_key", apiKey); store.set("tl_key_manual", "1"); }
@@ -431,6 +443,7 @@ button.gear:hover, button.gear:focus-visible { background: rgba(255,255,255,.12)
 
   if (navigator.wakeLock) navigator.wakeLock.request("screen").catch(() => {});
 
+  showStopName(store.get("tl_stopname:" + stopQuery) || stopQuery);
   tick();
   load();
   setInterval(tick, 1000);

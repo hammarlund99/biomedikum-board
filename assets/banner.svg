@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" width="1200" height="420" role="img" aria-label="Departure Board – live bus departures on your home screen">
+  <defs>
+    <radialGradient id="pink" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(80 -40) scale(620 480)">
+      <stop offset="0" stop-color="#f45cd8" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#f45cd8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cyan" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1180 460) scale(640 420)">
+      <stop offset="0" stop-color="#3ee6f2" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#3ee6f2" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffbf47" stop-opacity=".26"/>
+      <stop offset=".75" stop-color="#ffbf47" stop-opacity=".04"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f45cd8"/>
+      <stop offset="1" stop-color="#3ee6f2"/>
+    </linearGradient>
+    <clipPath id="frame"><rect width="1200" height="420" rx="28"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <rect width="1200" height="420" fill="#07070d"/>
+    <rect width="1200" height="420" fill="url(#pink)"/>
+    <rect width="1200" height="420" fill="url(#cyan)"/>
+
+    <!-- Title side -->
+    <circle cx="80" cy="112" r="6" fill="#3ee6f2"/>
+    <text x="96" y="118" font-size="20" font-weight="500" fill="#8a8ca8">Live · every stop in Sweden</text>
+    <text x="72" y="200" font-size="68" font-weight="700" fill="#f2f3fa" letter-spacing="-2">Departure Board</text>
+    <text x="74" y="252" font-size="24" font-weight="400" fill="#b4b6cc">Your next bus, at a glance.</text>
+    <text x="74" y="286" font-size="24" font-weight="400" fill="#b4b6cc">Right on your home screen.</text>
+    <rect x="74" y="330" width="300" height="4" rx="2" fill="#ffffff" fill-opacity=".08"/>
+    <rect x="74" y="330" width="132" height="4" rx="2" fill="url(#bar)"/>
+
+    <!-- Mini board -->
+    <g transform="translate(700 70)">
+      <rect width="430" height="132" rx="24" fill="#ffffff" fill-opacity=".045"/>
+      <rect width="430" height="132" rx="24" fill="url(#hero)" stroke="#ffbf47" stroke-opacity=".28"/>
+      <text x="24" y="38" font-size="16" font-weight="500" fill="#ffd27a">Next bus</text>
+      <rect x="24" y="56" width="62" height="50" rx="14" fill="#ffbf47"/>
+      <text x="55" y="91" font-size="26" font-weight="700" fill="#0a0a12" text-anchor="middle">3</text>
+      <text x="102" y="80" font-size="24" font-weight="600" fill="#f2f3fa">Södersjukhuset</text>
+      <circle cx="108" cy="99" r="5" fill="#ffbf47"/>
+      <text x="120" y="104" font-size="15" fill="#ffbf47">live</text>
+      <text x="386" y="104" font-size="56" font-weight="700" fill="#ffbf47" text-anchor="end" letter-spacing="-2">3</text>
+      <text x="390" y="104" font-size="17" fill="#8a8ca8">min</text>
+
+      <g transform="translate(0 146)">
+        <rect width="430" height="64" rx="18" fill="#ffffff" fill-opacity=".045"/>
+        <rect x="12" y="13" width="48" height="38" rx="11" fill="#3dffa8" fill-opacity=".16"/>
+        <text x="36" y="39" font-size="19" font-weight="700" fill="#3dffa8" text-anchor="middle">6</text>
+        <text x="76" y="38" font-size="19" font-weight="600" fill="#f2f3fa">Ropsten</text>
+        <text x="380" y="42" font-size="30" font-weight="700" fill="#3dffa8" text-anchor="end" letter-spacing="-1">10</text>
+        <text x="384" y="42" font-size="14" fill="#8a8ca8">min</text>
+      </g>
+      <g transform="translate(0 218)">
+        <rect width="430" height="64" rx="18" fill="#ffffff" fill-opacity=".045"/>
+        <rect x="12" y="13" width="48" height="38" rx="11" fill="#ff6b3d" fill-opacity=".16"/>
+        <text x="36" y="39" font-size="19" font-weight="700" fill="#ff6b3d" text-anchor="middle">5</text>
+        <text x="76" y="38" font-size="19" font-weight="600" fill="#f2f3fa">Liljeholmen</text>
+        <text x="380" y="42" font-size="30" font-weight="700" fill="#ff6b3d" text-anchor="end" letter-spacing="-1">15</text>
+        <text x="384" y="42" font-size="14" fill="#8a8ca8">min</text>
+      </g>
+    </g>
+  </g>
+</svg>

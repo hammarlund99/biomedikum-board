@@ -46,6 +46,16 @@ That's it. The board starts on Karolinska Sjukhuset Biomedicum. Change the stop 
 
 <br>
 
+## Made for everyday moments
+
+Departure Board answers one question, fast: *when does my next bus leave?*
+
+- **Out the door on time.** Set the stop next to your home and glance at it while you put your shoes on. You'll know whether to walk or run.
+- **Never miss the daycare pickup.** Switch to the stop outside work in the afternoon and see exactly when to leave your desk.
+- **Anywhere in Sweden.** Trafiklab covers public transport across the whole country, so the board works at any bus stop, not just in Stockholm.
+
+<br>
+
 ## Make it yours
 
 **Choose your stop.** Type a stop name under Settings, for example `Odenplan` or `Solna centrum`. The header updates to the stop you picked.
@@ -59,7 +69,7 @@ That's it. The board starts on Karolinska Sjukhuset Biomedicum. Change the stop 
 ## Good to know
 
 - **Your key stays with you.** It is saved in your browser only and sent straight to Trafiklab. Nothing passes through any other server.
-- **Updates every minute.** That is about 43,000 calls a month, well inside Trafiklab's free Bronze limit of 100,000.
+- **The free key is more than enough.** The board asks for new departures once a minute while it is open, and stops when you close it. Check it for half an hour each morning and you use about 900 of the 100,000 calls a free Bronze key gets every month. Even a screen running around the clock (about 43,000 calls) stays well inside the limit.
 - **"Scheduled" is normal.** SL sends live times once a bus is on its way, so buses further down the list show their timetable time until they get closer.
 - **Don't share a link with `?key=` in it.** That shares your key. Send the plain link and let everyone add their own.
 

@@ -40,7 +40,7 @@
 |:--:|:--|
 | **1** | **Get a free API key.** Create a project at [developer.trafiklab.se](https://developer.trafiklab.se) and add **Trafiklab Realtime APIs**. |
 | **2** | **Open the app** at [hammarlund99.github.io/departure-board](https://hammarlund99.github.io/departure-board/), tap **Settings** and paste your key. |
-| **3** | **Add it to your home screen.** iPhone: Share → *Add to Home Screen*. Android: menu → *Install app*. |
+| **3** | **Add it to your home screen.** iPhone: Share → *Add to Home Screen*. Android: menu → *Install app*. To get live data, add the key once more. |
 
 That's it. The board starts on Karolinska Sjukhuset Biomedicum. Change the stop under **Settings** whenever you like.
 
